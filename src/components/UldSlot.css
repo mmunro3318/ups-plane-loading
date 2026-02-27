@@ -1,0 +1,68 @@
+/* src/components/UldSlot.css */
+.uld-slot {
+    width: 6.5rem;
+    height: 5.5rem;
+    border-radius: var(--border-radius-slot);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    box-sizing: border-box;
+}
+
+.empty-slot {
+    border: 1px dashed rgba(0, 229, 255, 0.1);
+    background: transparent;
+    box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.02);
+}
+
+.occupied-slot {
+    background: linear-gradient(135deg, var(--color-primary-cyan-translucent), var(--color-primary-cyan-dim));
+    backdrop-filter: blur(5px);
+    border: var(--border-subtle);
+    box-shadow: var(--glow-cyan-subtle);
+    border-color: rgba(0, 229, 255, 0.3);
+}
+
+.hazmat-slot {
+    background: linear-gradient(135deg, var(--color-hazard-red-translucent), rgba(255, 0, 0, 0.2));
+    /* Caution stripes effect */
+    background-image: repeating-linear-gradient(45deg,
+            rgba(255, 0, 0, 0.4),
+            rgba(255, 0, 0, 0.4) 10px,
+            rgba(0, 0, 0, 0.1) 10px,
+            rgba(0, 0, 0, 0.1) 20px);
+    border-color: rgba(255, 61, 0, 0.6);
+    box-shadow: var(--glow-red-pulsing);
+    animation: hazardPulse 2s infinite alternate;
+}
+
+@keyframes hazardPulse {
+    0% {
+        box-shadow: 0 0 15px rgba(255, 61, 0, 0.4);
+    }
+
+    100% {
+        box-shadow: 0 0 25px rgba(255, 61, 0, 0.7);
+    }
+}
+
+.uld-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-text-primary);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.uld-id-badge {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.uld-weight {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.8);
+}

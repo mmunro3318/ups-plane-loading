@@ -1,0 +1,80 @@
+/* src/components/ManifestSidebar.css */
+.manifest-sidebar {
+    width: 320px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 16px;
+}
+
+.manifest-title {
+    color: var(--color-primary-cyan);
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+    padding-bottom: 12px;
+}
+
+.manifest-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 8px;
+}
+
+.manifest-item {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--color-primary-cyan);
+    border-radius: 8px;
+    padding: 12px;
+    transition: background 0.2s ease;
+}
+
+.manifest-item:hover {
+    background: rgba(0, 229, 255, 0.05);
+}
+
+.manifest-item.hazmat {
+    border-left-color: var(--color-hazard-red);
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.id-label {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.type-badge {
+    font-size: 0.65rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.item-details {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.hazmat-alert {
+    color: var(--color-hazard-red);
+    font-weight: 700;
+    text-shadow: 0 0 5px rgba(255, 61, 0, 0.5);
+}
+
+.manifest-footer {
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}

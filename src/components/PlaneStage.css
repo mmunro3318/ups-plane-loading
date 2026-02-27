@@ -1,0 +1,100 @@
+/* src/components/PlaneStage.css */
+.plane-stage-container {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    height: 85vh;
+    display: flex;
+    justify-content: center;
+    border-radius: var(--border-radius-card);
+    background: transparent;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.ephemeral-fuselage-mask {
+    position: absolute;
+    top: 0;
+    left: 10%;
+    width: 80%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.15;
+    mix-blend-mode: screen;
+}
+
+.ephemeral-fuselage-mask img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: invert(1) hue-rotate(180deg) brightness(1.5) drop-shadow(0 0 20px var(--color-primary-cyan));
+    mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+}
+
+.plane-grid {
+    position: relative;
+    z-index: 10;
+    width: 60%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 0;
+}
+
+.mac-anchor-line {
+    position: absolute;
+    top: 45%;
+    /* roughly the MAC center point visually */
+    left: -20%;
+    width: 140%;
+    height: 2px;
+    background: var(--color-mac-green);
+    box-shadow: 0 0 10px var(--color-mac-green);
+    z-index: 5;
+    opacity: 0.8;
+}
+
+.mac-label {
+    position: absolute;
+    right: -70px;
+    top: -10px;
+    color: var(--color-mac-green);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 8px var(--color-mac-green);
+}
+
+.slots-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    overflow-y: auto;
+    padding: 20px 0;
+    /* Hide scrollbar for a cleaner look */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.slots-container::-webkit-scrollbar {
+    display: none;
+}
+
+.slot-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.position-label {
+    position: absolute;
+    left: -35px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+    font-family: var(--font-family-mono);
+}

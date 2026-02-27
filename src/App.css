@@ -1,0 +1,87 @@
+/* src/App.css */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 24px;
+  gap: 24px;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgba(0, 229, 255, 0.15);
+  padding-bottom: 16px;
+}
+
+.cyber-title {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--color-text-primary);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  margin: 0;
+}
+
+.cyber-title span {
+  font-weight: 700;
+  color: var(--color-primary-cyan);
+  text-shadow: var(--glow-cyan-active);
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+}
+
+.dot.active {
+  background: var(--color-primary-cyan);
+  box-shadow: var(--glow-cyan-subtle);
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.manifest-section {
+  flex: 0 0 auto;
+}
+
+.stage-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.control-section {
+  flex: 0 0 auto;
+}
