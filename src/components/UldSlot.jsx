@@ -6,7 +6,7 @@ export default function UldSlot({ slot, style }) {
     if (!slot) return null;
 
     const isEmpty = !slot.uld;
-    const isHazmat = slot.uld?.isHazmatAccessible;
+    const isHazmat = !!slot.uld?.hazmatType;
 
     // Base styles + positional styles
     let classNames = ["uld-slot"];

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PlaneStage from './components/PlaneStage';
 import ManifestSidebar from './components/ManifestSidebar';
 import ControlPanel from './components/ControlPanel';
+import LandingPage from './components/LandingPage';
 import { generateEmptySlots, ULD_TYPES } from './engine/planeData';
 import { optimizeLoadOrder } from './engine/optimizer';
 import { calculateMacPercent } from './engine/scoring';
@@ -11,23 +12,30 @@ import './App.css';
 // Mock data generator for MVP
 function generateManifest() {
   return [
-    { id: 'A2-001X', type: 'A2', weight: 12500, isHazmatAccessible: false },
-    { id: 'A2-002Y', type: 'A2', weight: 9800, isHazmatAccessible: true },
-    { id: 'PZ-045W', type: 'PAG', weight: 4500, isHazmatAccessible: false },
-    { id: 'PZ-112Q', type: 'PAG', weight: 11200, isHazmatAccessible: false },
-    { id: 'A2-990P', type: 'A2', weight: 8900, isHazmatAccessible: false },
-    { id: 'A2-111R', type: 'A2', weight: 13100, isHazmatAccessible: false },
-    { id: 'A2-222K', type: 'A2', weight: 5000, isHazmatAccessible: true },
-    { id: 'PZ-333L', type: 'PAG', weight: 7000, isHazmatAccessible: false },
+    { id: 'AAY007324', type: 'A2', weight: 12500, hazmatType: 'U' },
+    { id: 'AAD002138', type: 'A1', weight: 9800, hazmatType: 'A' },
+    { id: 'PAG001234', type: 'PAG', weight: 4500, hazmatType: null },
+    { id: 'PAH009876', type: 'PAH', weight: 11200, hazmatType: null },
+    { id: 'AAY008902', type: 'A2', weight: 8900, hazmatType: 'C' },
+    { id: 'AAY001111', type: 'A2', weight: 13100, hazmatType: 'F' },
+    { id: 'AAD002222', type: 'A1', weight: 5000, hazmatType: 'R' },
+    { id: 'PAG003333', type: 'PAG', weight: 7000, hazmatType: 'B' },
   ];
 }
 
 function App() {
+  const [view, setView] = useState('landing');
+  const [selectedPlane, setSelectedPlane] = useState(null);
   const [manifest, setManifest] = useState(generateManifest());
   const [loadOrder, setLoadOrder] = useState(generateEmptySlots());
   const [isSorting, setIsSorting] = useState(false);
   const [macPercent, setMacPercent] = useState(null);
   const [bestScore, setBestScore] = useState(null);
+
+  const handleSelectPlane = (planeId) => {
+    setSelectedPlane(planeId);
+    setView('dashboard');
+  };
 
   // Initial naive greedy load: Just dump them in order for now 
   // Wait, the PRD says greedy init -> heaviest aft.
@@ -37,9 +45,9 @@ function App() {
     const nextOrder = generateEmptySlots();
     let manifestIdx = 0;
 
-    // Place hazmats first at positions 1 and 2
+    // Place accessible hazmats first at positions 1 and 2
     for (let i = 0; i < sortedManifest.length; i++) {
-      if (sortedManifest[i].isHazmatAccessible) {
+      if (sortedManifest[i].hazmatType === 'A') {
         // Find empty front slot
         for (let p = 0; p < 2; p++) {
           if (!nextOrder[p].uld) {
@@ -53,7 +61,7 @@ function App() {
     // Place heaviest remaining towards the back
     let backIdx = nextOrder.length - 1;
     for (let i = 0; i < sortedManifest.length; i++) {
-      if (!sortedManifest[i].isHazmatAccessible) {
+      if (sortedManifest[i].hazmatType !== 'A') {
         while (backIdx >= 0 && nextOrder[backIdx].uld) {
           backIdx--;
         }
@@ -86,18 +94,24 @@ function App() {
     }, 100);
   };
 
+  if (view === 'landing') {
+    return <LandingPage onSelectPlane={handleSelectPlane} />;
+  }
+
   return (
     <div className="app-layout">
       <header className="app-header">
-        <h1 className="cyber-title">UPS <span>LoadBalancer</span></h1>
+        <h1 className="cyber-title" style={{ cursor: 'pointer' }} onClick={() => setView('landing')}>
+          UPS <span>LoadBalancer</span>
+        </h1>
         <div className="header-status mono-text">
-          <span className="dot active"></span> SYSTEM ONLINE // B757-200F
+          <span className="dot active"></span> SYSTEM ONLINE // {selectedPlane || 'B757-200F'}
         </div>
       </header>
 
       <main className="dashboard-main">
         <section className="manifest-section">
-          <ManifestSidebar ulds={manifest} />
+          <ManifestSidebar ulds={manifest} loadOrder={loadOrder} />
         </section>
 
         <section className="stage-section">

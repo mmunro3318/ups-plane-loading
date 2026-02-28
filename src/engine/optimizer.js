@@ -34,10 +34,7 @@ export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 
     for (let i = 0; i < maxIterations; i++) {
         const neighbor = generateNeighbor(currentOrder);
 
-        // Only accept if it breaks no physical/safety constraints
-        if (!isLoadOrderValid(neighbor)) {
-            continue;
-        }
+        // Removed strict isLoadOrderValid check so algorithms can evaluate penalized invalid states
 
         const neighborScore = scoreLoadOrder(neighbor);
         const delta = neighborScore - currentScore;

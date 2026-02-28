@@ -19,8 +19,18 @@ export const ULD_TYPES = {
         weightMax: 13300,
         type: "container",
     },
+    "A1": {
+        name: "A1 Container",
+        weightMax: 13300,
+        type: "container",
+    },
     "PAG": {
         name: "PAG Pallet",
+        weightMax: 13300,
+        type: "pallet",
+    },
+    "PAH": {
+        name: "PAH Pallet",
         weightMax: 13300,
         type: "pallet",
     }

@@ -29,6 +29,12 @@ The web app looks _really_ nice. A few observations and asks:
 Let's batch these features for development:
 
 1. Fix the fuselage background and ULD alignment.
-2. Apply tweaks to ULD cards and data structures.
+2. Apply tweaks to ULD cards and data structures (including Hazmat constraints).
 3. Hook up a functional sort algorithm that runs when we click "Sort Manifest".
 4. Add the initial landing page with plane model selectors.
+
+**Note:** Research the hazmat labels and constraints used by UPS for the ULDs and plane loading. 
+
+---
+
+Prompt: A high-quality 3D stylized low-poly model of a [PLANE TYPE] in UPS cargo livery (white fuselage, dark brown top, and gold tail logo). The aircraft is shown from an isometric 3/4 top-down perspective. [DETAILS]. The model has clean, smooth surfaces and a matte finish, resembling a premium desk toy. The background is a moody dark teal and black gradient with soft studio lighting and a subtle vignette. The image is framed as a digital collectible card with minimalist white sans-serif text at the bottom displaying the plane name and a registration number, and a small UPS logo in the top left corner.
