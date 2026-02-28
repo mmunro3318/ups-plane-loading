@@ -12,9 +12,9 @@
 }
 
 .empty-slot {
-    border: 1px dashed rgba(0, 229, 255, 0.1);
+    border: 1px dashed var(--color-accent-yellow-translucent);
     background: transparent;
-    box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.02);
+    box-shadow: inset 0 0 10px var(--color-accent-yellow-glow);
 }
 
 .occupied-slot {
