@@ -9,6 +9,12 @@
     height: fit-content;
 }
 
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 .metrics-area {
     display: flex;
     flex-direction: column;

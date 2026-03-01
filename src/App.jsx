@@ -4,23 +4,15 @@ import PlaneStage from './components/PlaneStage';
 import ManifestSidebar from './components/ManifestSidebar';
 import ControlPanel from './components/ControlPanel';
 import LandingPage from './components/LandingPage';
-import { generateEmptySlots, ULD_TYPES } from './engine/planeData';
+import { generateEmptySlots, BOEING_757_SPECS } from './engine/planeData';
 import { optimizeLoadOrder } from './engine/optimizer';
 import { calculateMacPercent } from './engine/scoring';
+import { generateRandomManifest } from './engine/manifestGenerator';
 import './App.css';
 
 // Mock data generator for MVP
 function generateManifest() {
-  return [
-    { id: 'AAY007324', type: 'A2', weight: 12500, hazmatType: 'U' },
-    { id: 'AAD002138', type: 'A1', weight: 9800, hazmatType: 'A' },
-    { id: 'PAG001234', type: 'PAG', weight: 4500, hazmatType: null },
-    { id: 'PAH009876', type: 'PAH', weight: 11200, hazmatType: null },
-    { id: 'AAY008902', type: 'A2', weight: 8900, hazmatType: 'C' },
-    { id: 'AAY001111', type: 'A2', weight: 13100, hazmatType: 'F' },
-    { id: 'AAD002222', type: 'A1', weight: 5000, hazmatType: 'R' },
-    { id: 'PAG003333', type: 'PAG', weight: 7000, hazmatType: 'B' },
-  ];
+  return generateRandomManifest(BOEING_757_SPECS.positions, 'mixed');
 }
 
 function App() {
@@ -37,18 +29,14 @@ function App() {
     setView('dashboard');
   };
 
-  // Initial naive greedy load: Just dump them in order for now 
-  // Wait, the PRD says greedy init -> heaviest aft.
-  // Let's implement that.
-  useEffect(() => {
-    const sortedManifest = [...manifest].sort((a, b) => b.weight - a.weight);
+  // Initial loading logic moved to a reusable function
+  const applyInitialLoad = (newManifest) => {
+    const sortedManifest = [...newManifest].sort((a, b) => b.weight - a.weight);
     const nextOrder = generateEmptySlots();
-    let manifestIdx = 0;
 
     // Place accessible hazmats first at positions 1 and 2
     for (let i = 0; i < sortedManifest.length; i++) {
       if (sortedManifest[i].hazmatType === 'A') {
-        // Find empty front slot
         for (let p = 0; p < 2; p++) {
           if (!nextOrder[p].uld) {
             nextOrder[p].uld = sortedManifest[i];
@@ -58,10 +46,13 @@ function App() {
       }
     }
 
-    // Place heaviest remaining towards the back
+    // Place remaining towards the back (greedy heavy-aft)
     let backIdx = nextOrder.length - 1;
     for (let i = 0; i < sortedManifest.length; i++) {
       if (sortedManifest[i].hazmatType !== 'A') {
+        const alreadyPlaced = nextOrder.some(slot => slot.uld?.id === sortedManifest[i].id);
+        if (alreadyPlaced) continue;
+
         while (backIdx >= 0 && nextOrder[backIdx].uld) {
           backIdx--;
         }
@@ -73,7 +64,18 @@ function App() {
 
     setLoadOrder(nextOrder);
     setMacPercent(calculateMacPercent(nextOrder));
+  };
+
+  useEffect(() => {
+    applyInitialLoad(manifest);
   }, []);
+
+  const handleRegenerate = (scenario = 'mixed') => {
+    const newManifest = generateRandomManifest(BOEING_757_SPECS.positions, scenario);
+    setManifest(newManifest);
+    applyInitialLoad(newManifest);
+    setBestScore(null);
+  };
 
   const handleSort = () => {
     if (isSorting) return;
@@ -121,6 +123,7 @@ function App() {
         <section className="control-section">
           <ControlPanel
             onSort={handleSort}
+            onRegenerate={handleRegenerate}
             isSorting={isSorting}
             currentScore={bestScore}
             macPercent={macPercent}

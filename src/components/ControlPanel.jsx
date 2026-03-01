@@ -3,7 +3,7 @@ import React from 'react';
 import { BOEING_757_SPECS } from '../engine/planeData';
 import './ControlPanel.css';
 
-export default function ControlPanel({ onSort, isSorting, currentScore, macPercent }) {
+export default function ControlPanel({ onSort, onRegenerate, isSorting, currentScore, macPercent }) {
     // Determine the color of the score based on how close it is to the optimal MAC
     const deviation = Math.abs(BOEING_757_SPECS.optimalAftCog - macPercent);
     let scoreColorClass = "score-good";
@@ -28,13 +28,23 @@ export default function ControlPanel({ onSort, isSorting, currentScore, macPerce
                 </div>
             </div>
 
-            <button
-                className={`sort-action-btn ${isSorting ? 'sorting' : ''}`}
-                onClick={onSort}
-                disabled={isSorting}
-            >
-                {isSorting ? 'OPTIMIZING...' : 'SORT MANIFEST'}
-            </button>
+            <div className="action-buttons">
+                <button
+                    className={`sort-action-btn ${isSorting ? 'sorting' : ''}`}
+                    onClick={onSort}
+                    disabled={isSorting}
+                >
+                    {isSorting ? 'OPTIMIZING...' : 'SORT MANIFEST'}
+                </button>
+
+                <button
+                    className="regen-btn mono-text"
+                    onClick={() => onRegenerate('mixed')}
+                    disabled={isSorting}
+                >
+                    REGEN MANIFEST
+                </button>
+            </div>
         </div>
     );
 }
