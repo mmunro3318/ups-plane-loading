@@ -84,6 +84,14 @@ export function scoreLoadOrder(loadOrder) {
 
     // --- TIPPING PREVENTION CONSTRAINTS ---
 
+    // 0. Position 1 Dependency on Position 15 (Tail-Tip Protection)
+    const pos1Slot = loadOrder.find(s => s.positionId === 1);
+    const pos15Slot = loadOrder.find(s => s.positionId === 15);
+    if (pos1Slot && !pos1Slot.uld && pos15Slot && pos15Slot.uld) {
+        // Massive penalty to ensure optimizer rejects leaving pos 1 empty if pos 15 has cargo
+        penalty += 50000;
+    }
+
     // 1. Cumulative Aft Limits (from planeData poster limits)
     if (BOEING_757_SPECS.cumulativeAftLimits) {
         BOEING_757_SPECS.cumulativeAftLimits.forEach(limit => {
@@ -146,6 +154,11 @@ export function isLoadOrderValid(loadOrder) {
             }
         }
     }
+
+    // Position 1 vs 15 rule
+    const pos1Slot = loadOrder.find(s => s.positionId === 1);
+    const pos15Slot = loadOrder.find(s => s.positionId === 15);
+    if (pos1Slot && !pos1Slot.uld && pos15Slot && pos15Slot.uld) return false;
 
     const macPercent = calculateMacPercent(loadOrder);
     if (macPercent < BOEING_757_SPECS.safeEnvelopePercent.min || macPercent > BOEING_757_SPECS.safeEnvelopePercent.max) {

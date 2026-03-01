@@ -34,7 +34,27 @@ function generateNeighbor(currentOrder, lockedPositions = []) {
     return nextOrder;
 }
 
-export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 5000, tailTipMode = 'none') {
+export function randomizeLoadOrder(initialLoadOrder, tailTipMode = 'none') {
+    let currentOrder = copyLoadOrder(initialLoadOrder);
+
+    // Determine locked positions based on tailTipMode
+    let lockedPositions = [];
+    const numVoids = currentOrder.filter(slot => !slot.uld).length;
+
+    if (tailTipMode === 'single' && numVoids >= BOEING_757_SPECS.tailTipConfig.single.minVoidsRequired) {
+        lockedPositions = BOEING_757_SPECS.tailTipConfig.single.forceVoidPositions;
+    } else if (tailTipMode === 'double' && numVoids >= BOEING_757_SPECS.tailTipConfig.double.minVoidsRequired) {
+        lockedPositions = BOEING_757_SPECS.tailTipConfig.double.forceVoidPositions;
+    }
+
+    // Perform enough valid random swaps to scramble the order
+    for (let i = 0; i < 50; i++) {
+        currentOrder = generateNeighbor(currentOrder, lockedPositions);
+    }
+    return currentOrder;
+}
+
+export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 5000, tailTipMode = 'none', initialTemperature = 100.0, coolingRate = 0.995) {
     let currentOrder = copyLoadOrder(initialLoadOrder);
 
     // Determine locked positions based on tailTipMode
@@ -52,8 +72,7 @@ export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 
     let bestOrder = copyLoadOrder(currentOrder);
     let bestScore = currentScore;
 
-    let temperature = 100.0;
-    const coolingRate = 0.995;
+    let temperature = initialTemperature;
 
     for (let iter = 0; iter < maxIterations; iter++) {
         const neighbor = generateNeighbor(currentOrder, lockedPositions);

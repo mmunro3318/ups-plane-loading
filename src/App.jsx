@@ -5,7 +5,7 @@ import ManifestSidebar from './components/ManifestSidebar';
 import ControlPanel from './components/ControlPanel';
 import LandingPage from './components/LandingPage';
 import { generateEmptySlots, BOEING_757_SPECS } from './engine/planeData';
-import { optimizeLoadOrder } from './engine/optimizer';
+import { optimizeLoadOrder, randomizeLoadOrder } from './engine/optimizer';
 import { calculateMacPercent } from './engine/scoring';
 import { generateRandomManifest } from './engine/manifestGenerator';
 import './App.css';
@@ -24,6 +24,12 @@ function App() {
   const [macPercent, setMacPercent] = useState(null);
   const [bestScore, setBestScore] = useState(null);
   const [tailTipMode, setTailTipMode] = useState('none');
+  const [algoParams, setAlgoParams] = useState({
+    temperature: 100.0,
+    coolingRate: 0.995,
+    maxIterations: 10000,
+    greedySeed: true
+  });
 
   const handleSelectPlane = (planeId) => {
     setSelectedPlane(planeId);
@@ -115,11 +121,18 @@ function App() {
 
     // We run the optimizer async so we don't block the UI entirely
     setTimeout(() => {
+      let initialOrder = loadOrder;
+      if (!algoParams.greedySeed) {
+        initialOrder = randomizeLoadOrder(loadOrder, tailTipMode);
+      }
+
       const { bestOrder, bestScore } = optimizeLoadOrder(
-        loadOrder,
+        initialOrder,
         null, // progress callback not used sync
-        10000, // 10k iterations
-        tailTipMode
+        algoParams.maxIterations,
+        tailTipMode,
+        algoParams.temperature,
+        algoParams.coolingRate
       );
 
       setLoadOrder(bestOrder);
@@ -163,6 +176,8 @@ function App() {
             tailTipMode={tailTipMode}
             onTailTipChange={handleTailTipChange}
             manifest={manifest}
+            algoParams={algoParams}
+            setAlgoParams={setAlgoParams}
           />
         </section>
       </main>
