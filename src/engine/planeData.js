@@ -9,6 +9,27 @@ export const BOEING_757_SPECS = {
     safeEnvelopePercent: { min: 7, max: 39 },
     maxWeightPerPosition: 6700, // lbs
 
+    // Tipping Prevention Constraints
+    cumulativeAftLimits: [
+        { positions: [15], maxWeight: 6700 },
+        { positions: [14, 15], maxWeight: 12000 },
+        { positions: [13, 14, 15], maxWeight: 18000 },
+        { positions: [12, 13, 14, 15], maxWeight: 24000 },
+        { positions: [11, 12, 13, 14, 15], maxWeight: 30000 }
+    ],
+    forwardBallastRule: {
+        triggerWeightAft: 25000,
+        aftPositions: [11, 12, 13, 14, 15],
+        requiredBallastForward: 4000,
+        forwardPositions: [1, 2]
+    },
+
+    // UI and Logic configuration for manual Tail-Tip modes
+    tailTipConfig: {
+        single: { minVoidsRequired: 2, forceVoidPositions: [1, 15] },
+        double: { minVoidsRequired: 4, forceVoidPositions: [1, 2, 14, 15] }
+    },
+
     // Position coordinates for rendering (x, y % offsets)
     // Assuming a top-down view. Coordinates can be tweaked via UI later.
 };

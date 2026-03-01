@@ -1,16 +1,30 @@
 // src/engine/optimizer.js
 import { scoreLoadOrder, isLoadOrderValid } from './scoring.js';
 
+import { BOEING_757_SPECS } from './planeData.js';
+
 function copyLoadOrder(loadOrder) {
     return loadOrder.map(slot => ({ ...slot }));
 }
 
-// Generate a random neighbor by swapping two random slots
-function generateNeighbor(currentOrder) {
+// Generate a random neighbor by swapping two random slots, respecting locked positions
+function generateNeighbor(currentOrder, lockedPositions = []) {
     const nextOrder = copyLoadOrder(currentOrder);
-    const i = Math.floor(Math.random() * nextOrder.length);
-    let j = Math.floor(Math.random() * nextOrder.length);
-    while (i === j) j = Math.floor(Math.random() * nextOrder.length);
+
+    // Get array of indices that are NOT locked
+    const swappableIndices = nextOrder
+        .map((slot, index) => ({ index, positionId: slot.positionId }))
+        .filter(item => !lockedPositions.includes(item.positionId))
+        .map(item => item.index);
+
+    if (swappableIndices.length < 2) return nextOrder; // Cannot swap
+
+    let iIdx = Math.floor(Math.random() * swappableIndices.length);
+    let jIdx = Math.floor(Math.random() * swappableIndices.length);
+    while (iIdx === jIdx) jIdx = Math.floor(Math.random() * swappableIndices.length);
+
+    const i = swappableIndices[iIdx];
+    const j = swappableIndices[jIdx];
 
     // Swap the ULDs
     const temp = nextOrder[i].uld;
@@ -20,8 +34,18 @@ function generateNeighbor(currentOrder) {
     return nextOrder;
 }
 
-export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 5000) {
+export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 5000, tailTipMode = 'none') {
     let currentOrder = copyLoadOrder(initialLoadOrder);
+
+    // Determine locked positions based on tailTipMode
+    let lockedPositions = [];
+    const numVoids = currentOrder.filter(slot => !slot.uld).length;
+
+    if (tailTipMode === 'single' && numVoids >= BOEING_757_SPECS.tailTipConfig.single.minVoidsRequired) {
+        lockedPositions = BOEING_757_SPECS.tailTipConfig.single.forceVoidPositions;
+    } else if (tailTipMode === 'double' && numVoids >= BOEING_757_SPECS.tailTipConfig.double.minVoidsRequired) {
+        lockedPositions = BOEING_757_SPECS.tailTipConfig.double.forceVoidPositions;
+    }
 
     // Fallback if initial is invalid, though "greedy seed" should build a valid one.
     let currentScore = scoreLoadOrder(currentOrder);
@@ -31,8 +55,8 @@ export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 
     let temperature = 100.0;
     const coolingRate = 0.995;
 
-    for (let i = 0; i < maxIterations; i++) {
-        const neighbor = generateNeighbor(currentOrder);
+    for (let iter = 0; iter < maxIterations; iter++) {
+        const neighbor = generateNeighbor(currentOrder, lockedPositions);
 
         // Removed strict isLoadOrderValid check so algorithms can evaluate penalized invalid states
 
@@ -53,8 +77,8 @@ export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 
         temperature *= coolingRate;
 
         // Report progress occasionally
-        if (i % 100 === 0 && onProgress) {
-            onProgress(bestOrder, bestScore, (i / maxIterations) * 100);
+        if (iter % 100 === 0 && onProgress) {
+            onProgress(bestOrder, bestScore, (iter / maxIterations) * 100);
         }
     }
 

@@ -23,6 +23,7 @@ function App() {
   const [isSorting, setIsSorting] = useState(false);
   const [macPercent, setMacPercent] = useState(null);
   const [bestScore, setBestScore] = useState(null);
+  const [tailTipMode, setTailTipMode] = useState('none');
 
   const handleSelectPlane = (planeId) => {
     setSelectedPlane(planeId);
@@ -30,15 +31,30 @@ function App() {
   };
 
   // Initial loading logic moved to a reusable function
-  const applyInitialLoad = (newManifest) => {
+  const applyInitialLoad = (newManifest, currentTailTipMode = 'none') => {
     const sortedManifest = [...newManifest].sort((a, b) => b.weight - a.weight);
     const nextOrder = generateEmptySlots();
+
+    // -- Handle Tail Tip Logic --
+    const totalVoids = BOEING_757_SPECS.positions - sortedManifest.length;
+    let forcedVoids = [];
+
+    if (currentTailTipMode === 'single' && totalVoids >= BOEING_757_SPECS.tailTipConfig.single.minVoidsRequired) {
+      forcedVoids = BOEING_757_SPECS.tailTipConfig.single.forceVoidPositions;
+    } else if (currentTailTipMode === 'double' && totalVoids >= BOEING_757_SPECS.tailTipConfig.double.minVoidsRequired) {
+      forcedVoids = BOEING_757_SPECS.tailTipConfig.double.forceVoidPositions;
+    }
+
+    forcedVoids.forEach(pos => {
+      const slot = nextOrder.find(s => s.positionId === pos);
+      if (slot) slot.isForcedVoid = true;
+    });
 
     // Place accessible hazmats first at positions 1 and 2
     for (let i = 0; i < sortedManifest.length; i++) {
       if (sortedManifest[i].hazmatType === 'A') {
         for (let p = 0; p < 2; p++) {
-          if (!nextOrder[p].uld) {
+          if (!nextOrder[p].uld && !nextOrder[p].isForcedVoid) {
             nextOrder[p].uld = sortedManifest[i];
             break;
           }
@@ -53,7 +69,7 @@ function App() {
         const alreadyPlaced = nextOrder.some(slot => slot.uld?.id === sortedManifest[i].id);
         if (alreadyPlaced) continue;
 
-        while (backIdx >= 0 && nextOrder[backIdx].uld) {
+        while (backIdx >= 0 && (nextOrder[backIdx].uld || nextOrder[backIdx].isForcedVoid)) {
           backIdx--;
         }
         if (backIdx >= 0) {
@@ -62,19 +78,35 @@ function App() {
       }
     }
 
+    nextOrder.forEach(slot => delete slot.isForcedVoid);
+
     setLoadOrder(nextOrder);
     setMacPercent(calculateMacPercent(nextOrder));
   };
 
   useEffect(() => {
-    applyInitialLoad(manifest);
+    applyInitialLoad(manifest, tailTipMode);
   }, []);
 
   const handleRegenerate = (scenario = 'mixed') => {
     const newManifest = generateRandomManifest(BOEING_757_SPECS.positions, scenario);
     setManifest(newManifest);
-    applyInitialLoad(newManifest);
+
+    // Automatically reset Tail-Tip mode if the new manifest doesn't have enough voids
+    const newTotalVoids = BOEING_757_SPECS.positions - newManifest.length;
+    let safeTailTipMode = tailTipMode;
+    if (tailTipMode === 'double' && newTotalVoids < BOEING_757_SPECS.tailTipConfig.double.minVoidsRequired) safeTailTipMode = 'none';
+    if (tailTipMode === 'single' && newTotalVoids < BOEING_757_SPECS.tailTipConfig.single.minVoidsRequired) safeTailTipMode = 'none';
+
+    if (safeTailTipMode !== tailTipMode) setTailTipMode(safeTailTipMode);
+
+    applyInitialLoad(newManifest, safeTailTipMode);
     setBestScore(null);
+  };
+
+  const handleTailTipChange = (mode) => {
+    setTailTipMode(mode);
+    applyInitialLoad(manifest, mode);
   };
 
   const handleSort = () => {
@@ -86,7 +118,8 @@ function App() {
       const { bestOrder, bestScore } = optimizeLoadOrder(
         loadOrder,
         null, // progress callback not used sync
-        10000 // 10k iterations
+        10000, // 10k iterations
+        tailTipMode
       );
 
       setLoadOrder(bestOrder);
@@ -127,6 +160,9 @@ function App() {
             isSorting={isSorting}
             currentScore={bestScore}
             macPercent={macPercent}
+            tailTipMode={tailTipMode}
+            onTailTipChange={handleTailTipChange}
+            manifest={manifest}
           />
         </section>
       </main>

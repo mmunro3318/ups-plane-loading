@@ -82,6 +82,47 @@ export function scoreLoadOrder(loadOrder) {
         }
     }
 
+    // --- TIPPING PREVENTION CONSTRAINTS ---
+
+    // 1. Cumulative Aft Limits (from planeData poster limits)
+    if (BOEING_757_SPECS.cumulativeAftLimits) {
+        BOEING_757_SPECS.cumulativeAftLimits.forEach(limit => {
+            let sum = 0;
+            limit.positions.forEach(pos => {
+                const slot = loadOrder.find(s => s.positionId === pos);
+                if (slot && slot.uld) sum += slot.uld.weight;
+            });
+            if (sum > limit.maxWeight) {
+                // Massive penalty proportional to the violation to drive the optimizer away
+                penalty += 20000 + (sum - limit.maxWeight) * 10;
+            }
+        });
+    }
+
+    // 2. Minimum Forward Ballast Rule
+    if (BOEING_757_SPECS.forwardBallastRule) {
+        const rule = BOEING_757_SPECS.forwardBallastRule;
+        let aftSum = 0;
+        rule.aftPositions.forEach(pos => {
+            const slot = loadOrder.find(s => s.positionId === pos);
+            if (slot && slot.uld) aftSum += slot.uld.weight;
+        });
+
+        if (aftSum >= rule.triggerWeightAft) {
+            let forwardSum = 0;
+            rule.forwardPositions.forEach(pos => {
+                const slot = loadOrder.find(s => s.positionId === pos);
+                if (slot && slot.uld) forwardSum += slot.uld.weight;
+            });
+
+            if (forwardSum < rule.requiredBallastForward) {
+                // Penalty for not having enough ballast when tail is heavy
+                penalty += 25000 + (rule.requiredBallastForward - forwardSum) * 10;
+            }
+        }
+    }
+
+    // Envelope constraint
     if (macPercent < BOEING_757_SPECS.safeEnvelopePercent.min || macPercent > BOEING_757_SPECS.safeEnvelopePercent.max) {
         penalty += 20000;
     }

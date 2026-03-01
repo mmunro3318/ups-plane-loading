@@ -56,6 +56,48 @@
     color: rgba(255, 255, 255, 0.3);
 }
 
+.tail-tip-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 229, 255, 0.1);
+    border-radius: 6px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 16px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--color-text-primary);
+    font-size: 0.75rem;
+}
+
+.radio-label.disabled-label {
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.radio-label input[type="radio"] {
+    accent-color: var(--color-primary-cyan);
+    cursor: pointer;
+    background-color: var(--color-background-dark);
+}
+
+.radio-label.disabled-label input[type="radio"] {
+    cursor: not-allowed;
+}
+
 .sort-action-btn {
     appearance: none;
     border: none;
