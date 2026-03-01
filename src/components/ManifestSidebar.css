@@ -8,11 +8,109 @@
     gap: 16px;
 }
 
-.manifest-title {
-    color: var(--color-primary-cyan);
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     margin-bottom: 8px;
     border-bottom: 1px solid rgba(0, 229, 255, 0.2);
     padding-bottom: 12px;
+}
+
+.sort-container {
+    position: relative;
+    z-index: 100;
+}
+
+.sort-dropdown-toggle {
+    appearance: none;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    color: var(--color-primary-cyan);
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    min-width: 100px;
+    justify-content: space-between;
+}
+
+.sort-dropdown-toggle:hover,
+.sort-dropdown-toggle.active {
+    background: rgba(0, 229, 255, 0.08);
+    border-color: var(--color-primary-cyan);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+}
+
+.chevron {
+    font-size: 0.6rem;
+    transition: transform 0.3s;
+    opacity: 0.6;
+}
+
+.chevron.up {
+    transform: rotate(180deg);
+}
+
+.sort-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 160px;
+    background: rgba(10, 20, 22, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.1);
+    animation: dropdownPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top left;
+}
+
+@keyframes dropdownPop {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.sort-option {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sort-option:hover {
+    background: #1A54EE;
+    /* High-contrast blue from screenshot */
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.sort-option.selected {
+    color: var(--color-primary-cyan);
+    background: rgba(0, 229, 255, 0.05);
+}
+
+.sort-option.selected:hover {
+    background: #1A54EE;
+    color: white;
 }
 
 .manifest-list {
