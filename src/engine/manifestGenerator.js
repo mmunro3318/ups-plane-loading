@@ -1,4 +1,4 @@
-// src/engine/manifestGenerator.js
+import { BOEING_757_SPECS } from './planeData.js';
 
 const TARE_WEIGHTS = [460, 464, 490, 510];
 const ULD_ID_PREFIXES = ['AAY', 'AAD', 'PAG', 'PAH'];
@@ -14,23 +14,23 @@ function getRandomWeight(type, isEmpty = false) {
         return TARE_WEIGHTS[Math.floor(Math.random() * TARE_WEIGHTS.length)];
     }
 
+    let generatedWeight;
     if (type === 'PAG' || type === 'PAH') {
         // Pallets 4000-8000 (never empty)
-        return Math.floor(4000 + Math.random() * 4000);
-    }
-
-    // Containers (A2, A1) 800-8800, skewed to 1000-4000
-    // We'll use a simple transformation to skew the distribution:
-    // Math.random()^2 would skew towards 0. 
-    // We want a peak between 1000-4000.
-
-    const isSkewer = Math.random() < 0.7; // 70% chance to be in the "frequent" range
-    if (isSkewer) {
-        return Math.floor(1000 + Math.random() * 3000);
+        generatedWeight = Math.floor(4000 + Math.random() * 4000);
     } else {
-        // 30% chance to be anywhere else in the range [800, 8800]
-        return Math.floor(800 + Math.random() * 8000);
+        // Containers (A2, A1) 800-8800, skewed to 1000-4000
+        const isSkewer = Math.random() < 0.7; // 70% chance to be in the "frequent" range
+        if (isSkewer) {
+            generatedWeight = Math.floor(1000 + Math.random() * 3000);
+        } else {
+            // 30% chance to be anywhere else in the range [800, 8800]
+            generatedWeight = Math.floor(800 + Math.random() * 8000);
+        }
     }
+
+    // Ensure we do not generate impossible manifests by exceeding the plane's structural position limit
+    return Math.min(generatedWeight, BOEING_757_SPECS.maxWeightPerPosition);
 }
 
 function generateRandomId() {

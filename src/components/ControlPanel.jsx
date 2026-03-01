@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { BOEING_757_SPECS } from '../engine/planeData';
 import './ControlPanel.css';
 
-export default function ControlPanel({ onSort, onRegenerate, isSorting, currentScore, macPercent, tailTipMode, onTailTipChange, manifest, algoParams, setAlgoParams }) {
+export default function ControlPanel({ onSort, onRegenerate, isSorting, currentScore, macPercent, tailTipMode, onTailTipChange, manifest, algoParams, setAlgoParams, showProfiler, setShowProfiler }) {
     const [isParamsOpen, setIsParamsOpen] = useState(false);
     // Determine the color of the score based on how close it is to the optimal MAC
     const deviation = Math.abs(BOEING_757_SPECS.optimalAftCog - macPercent);
@@ -127,9 +127,20 @@ export default function ControlPanel({ onSort, onRegenerate, isSorting, currentS
                                 <span className="mono-text" title="Greedy Seed: Starts sorting from a heuristic rather than a random layout.">Greedy Seed</span>
                             </label>
                         </div>
+                        <div className="param-group checkbox-group">
+                            <label className="radio-label">
+                                <input
+                                    type="checkbox"
+                                    checked={showProfiler}
+                                    onChange={(e) => setShowProfiler(e.target.checked)}
+                                    disabled={isSorting}
+                                />
+                                <span className="mono-text" style={{ color: 'var(--color-hazard-red)' }} title="Dev Profiler: runs BOTH random and greedy searches and plots their simulated annealing history score.">DEV PROFILER (Plotting)</span>
+                            </label>
+                        </div>
                         <button
                             className="reset-params-btn mono-text"
-                            onClick={() => setAlgoParams({ temperature: 100.0, coolingRate: 0.995, maxIterations: 10000, greedySeed: true })}
+                            onClick={() => setAlgoParams({ temperature: 100.0, coolingRate: 0.999, maxIterations: 10000, greedySeed: true })}
                             disabled={isSorting}
                         >
                             RESET PARAMETERS

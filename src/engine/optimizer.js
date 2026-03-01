@@ -56,6 +56,7 @@ export function randomizeLoadOrder(initialLoadOrder, tailTipMode = 'none') {
 
 export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 5000, tailTipMode = 'none', initialTemperature = 100.0, coolingRate = 0.995) {
     let currentOrder = copyLoadOrder(initialLoadOrder);
+    let history = [];
 
     // Determine locked positions based on tailTipMode
     let lockedPositions = [];
@@ -74,7 +75,15 @@ export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 
 
     let temperature = initialTemperature;
 
-    for (let iter = 0; iter < maxIterations; iter++) {
+    // Track initial state
+    history.push({
+        iteration: 0,
+        currentScore: currentScore,
+        bestScore: bestScore,
+        temperature: temperature
+    });
+
+    for (let iter = 1; iter <= maxIterations; iter++) {
         const neighbor = generateNeighbor(currentOrder, lockedPositions);
 
         // Removed strict isLoadOrderValid check so algorithms can evaluate penalized invalid states
@@ -99,7 +108,17 @@ export function optimizeLoadOrder(initialLoadOrder, onProgress, maxIterations = 
         if (iter % 100 === 0 && onProgress) {
             onProgress(bestOrder, bestScore, (iter / maxIterations) * 100);
         }
+
+        // Track history for profiling (sample every 50 iterations to reduce data size)
+        if (iter % 50 === 0 || iter === maxIterations) {
+            history.push({
+                iteration: iter,
+                currentScore: currentScore,
+                bestScore: bestScore,
+                temperature: temperature
+            });
+        }
     }
 
-    return { bestOrder, bestScore };
+    return { bestOrder, bestScore, history };
 }

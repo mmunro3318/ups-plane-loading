@@ -10,6 +10,28 @@ function getPositionDistance(posId) {
     return startInchesFromDatum + (posId - 1) * inchesPerPosition;
 }
 
+const PENALTY_LIGHT_COMBI = 10; // Penalty for violating light combi
+const PENALTY_TAIL_TIP = 50;    // Massive penalty for tail tip risk
+
+/**
+ * Applies a non-linear scaling to the raw deviation.
+ * This is based on the MCTS implementation `reward_from_dev_linear`.
+ * 
+ * By using a gamma < 1 (e.g. 0.5 for square root), small deviations from
+ * optimal MAC are made mathematically "larger", forcing the optimizer to
+ * care more about tiny differences in highly optimized states, rather than
+ * treating them all as effectively zero.
+ * 
+ * @param {number} rawDeviation 
+ * @param {number} gamma  Ex: 0.5
+ * @returns {number} scaled deviation
+ */
+function scaleDeviation(rawDeviation, gamma = 0.5) {
+    if (rawDeviation <= 0) return 0;
+    // We scale the deviation using the power of gamma
+    return Math.pow(rawDeviation, gamma);
+}
+
 export function calculateMacPercent(loadOrder) {
     let totalWeight = 0;
     let totalMoment = 0;
@@ -39,10 +61,26 @@ export function calculateMacPercent(loadOrder) {
     return macPercent;
 }
 
-export function scoreLoadOrder(loadOrder) {
+/**
+ * Calculates the total score for a given load order
+ * A lower score is better (0 is perfect balance and no broken constraints)
+ * 
+ * @param {Array} loadOrder - Array of ULD objects
+ * @param {boolean} useScaling - Whether to apply non-linear scaling to the MAC deviation
+ * @returns {number} The calculated score
+ */
+export function scoreLoadOrder(loadOrder, useScaling = true) {
     const macPercent = calculateMacPercent(loadOrder);
     // Base score is deviation from optimal Aft CG
-    let score = Math.abs(BOEING_757_SPECS.optimalAftCog - macPercent);
+    let optimalMacDeviation = Math.abs(BOEING_757_SPECS.optimalAftCog - macPercent);
+
+    // Apply scaling to the MAC deviation if requested
+    const finalMacPenalty = useScaling ? scaleDeviation(optimalMacDeviation) : optimalMacDeviation;
+
+    // We weight the MAC deviation heavily so the optimizer prioritizes it
+    // Note: If using non-linear scaling (e.g., gamma=0.5), the raw value is already structurally transformed,
+    // so we might need less of an arbitrary multiplier, but we keep it to ensure it competes with constraints.
+    let score = finalMacPenalty * 10;
 
     let penalty = 0;
 

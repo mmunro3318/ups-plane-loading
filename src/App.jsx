@@ -4,6 +4,7 @@ import PlaneStage from './components/PlaneStage';
 import ManifestSidebar from './components/ManifestSidebar';
 import ControlPanel from './components/ControlPanel';
 import LandingPage from './components/LandingPage';
+import ScorePlot from './components/ScorePlot';
 import { generateEmptySlots, BOEING_757_SPECS } from './engine/planeData';
 import { optimizeLoadOrder, randomizeLoadOrder } from './engine/optimizer';
 import { calculateMacPercent } from './engine/scoring';
@@ -26,10 +27,12 @@ function App() {
   const [tailTipMode, setTailTipMode] = useState('none');
   const [algoParams, setAlgoParams] = useState({
     temperature: 100.0,
-    coolingRate: 0.995,
+    coolingRate: 0.999,
     maxIterations: 10000,
     greedySeed: true
   });
+  const [showProfiler, setShowProfiler] = useState(false);
+  const [profilerData, setProfilerData] = useState({ greedy: null, random: null });
 
   const handleSelectPlane = (planeId) => {
     setSelectedPlane(planeId);
@@ -121,23 +124,51 @@ function App() {
 
     // We run the optimizer async so we don't block the UI entirely
     setTimeout(() => {
-      let initialOrder = loadOrder;
-      if (!algoParams.greedySeed) {
-        initialOrder = randomizeLoadOrder(loadOrder, tailTipMode);
+      // If profiling is on, run both!
+      if (showProfiler) {
+        const greedyStart = loadOrder;
+        const randomStart = randomizeLoadOrder(loadOrder, tailTipMode);
+
+        const greedyResult = optimizeLoadOrder(
+          greedyStart, null, algoParams.maxIterations, tailTipMode, algoParams.temperature, algoParams.coolingRate
+        );
+
+        const randomResult = optimizeLoadOrder(
+          randomStart, null, algoParams.maxIterations, tailTipMode, algoParams.temperature, algoParams.coolingRate
+        );
+
+        setProfilerData({ greedy: greedyResult.history, random: randomResult.history });
+
+        // Adopt the better of the two for the UI
+        let bestOfTwo = greedyResult;
+        if (randomResult.bestScore < greedyResult.bestScore) {
+          bestOfTwo = randomResult;
+        }
+        setLoadOrder(bestOfTwo.bestOrder);
+        setBestScore(bestOfTwo.bestScore);
+        setMacPercent(calculateMacPercent(bestOfTwo.bestOrder));
+
+      } else {
+        // Normal single run
+        let initialOrder = loadOrder;
+        if (!algoParams.greedySeed) {
+          initialOrder = randomizeLoadOrder(loadOrder, tailTipMode);
+        }
+
+        const { bestOrder, bestScore } = optimizeLoadOrder(
+          initialOrder,
+          null, // progress callback not used sync
+          algoParams.maxIterations,
+          tailTipMode,
+          algoParams.temperature,
+          algoParams.coolingRate
+        );
+
+        setLoadOrder(bestOrder);
+        setBestScore(bestScore);
+        setMacPercent(calculateMacPercent(bestOrder));
       }
 
-      const { bestOrder, bestScore } = optimizeLoadOrder(
-        initialOrder,
-        null, // progress callback not used sync
-        algoParams.maxIterations,
-        tailTipMode,
-        algoParams.temperature,
-        algoParams.coolingRate
-      );
-
-      setLoadOrder(bestOrder);
-      setBestScore(bestScore);
-      setMacPercent(calculateMacPercent(bestOrder));
       setIsSorting(false);
     }, 100);
   };
@@ -178,8 +209,18 @@ function App() {
             manifest={manifest}
             algoParams={algoParams}
             setAlgoParams={setAlgoParams}
+            showProfiler={showProfiler}
+            setShowProfiler={setShowProfiler}
           />
         </section>
+
+        {showProfiler && profilerData.greedy && profilerData.random && (
+          <ScorePlot
+            greedyHistory={profilerData.greedy}
+            randomHistory={profilerData.random}
+            onClose={() => setShowProfiler(false)}
+          />
+        )}
       </main>
     </div>
   );
