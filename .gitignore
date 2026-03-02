@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Other
+ui-reference.webp
+workspace.md 
+tmp
