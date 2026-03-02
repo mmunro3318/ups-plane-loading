@@ -1,19 +1,24 @@
 // src/components/PlaneStage.jsx
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import UldSlot from './UldSlot';
 import { BOEING_757_SPECS } from '../engine/planeData';
 import './PlaneStage.css';
 
 export default function PlaneStage({ loadOrder }) {
-    // The MAC percentage physical location for drawing the visual line
-    // LEMAC is roughly at position 6 in the main deck of 757 when viewed top-down
-    // For visual simplicity in this MVP, we estimate the MAC line explicitly roughly 
-    // down the fuselage grid.
+    const scrollContainerRef = useRef(null);
+
+    useEffect(() => {
+        // Auto-center horizontal scroll on mobile mount
+        if (scrollContainerRef.current && window.innerWidth <= 1024) {
+            const container = scrollContainerRef.current;
+            container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+        }
+    }, [loadOrder.length]);
 
     return (
         <div className="plane-stage-container">
             <div className="plane-grid">
-                <div className="slots-container">
+                <div className="slots-container" ref={scrollContainerRef}>
 
                     {/* The scrollable wrapper that holds everything */}
                     <div className="scroll-content-wrapper">

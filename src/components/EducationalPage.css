@@ -184,3 +184,32 @@
         width: 100%;
     }
 }
+
+/* Image Zoom Feature */
+.edu-visual {
+    position: relative;
+    cursor: zoom-in;
+}
+
+.edu-visual.zoomed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2000;
+    background: rgba(0, 5, 10, 0.95);
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow: auto;
+    cursor: zoom-out;
+    padding: 0;
+}
+
+.edu-visual.zoomed .edu-image {
+    width: 200vw;
+    max-width: 200vw;
+    height: auto;
+    object-fit: contain;
+}

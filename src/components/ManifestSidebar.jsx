@@ -5,7 +5,7 @@ const LOAD_ORDER_SEQUENCE = [1, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 2, 3];
 
 const SORT_OPTIONS = [
     { value: 'none', label: 'None' },
-    { value: 'load', label: 'Load Order' },
+    { value: 'load', label: 'Sort Manifest' },
     { value: 'asc', label: 'Ascending' }
 ];
 
@@ -58,10 +58,19 @@ export default function ManifestSidebar({ ulds, loadOrder }) {
 
     const sortedUlds = getSortedUlds();
     const currentSortLabel = SORT_OPTIONS.find(opt => opt.value === sortMode)?.label;
+    const [isMobileCollapsed, setIsMobileCollapsed] = useState(window.innerWidth <= 1024);
 
     return (
-        <div className="manifest-sidebar glass-panel">
-            <header className="sidebar-header">
+        <div className={`manifest-sidebar glass-panel ${isMobileCollapsed ? 'collapsed' : ''}`}>
+            <header className="sidebar-header" style={{ justifyContent: 'space-between' }}>
+                <h2
+                    className="manifest-title label-text"
+                    onClick={() => { if (window.innerWidth <= 1024) setIsMobileCollapsed(!isMobileCollapsed); }}
+                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                    Cargo Manifest <span className="mobile-only-toggle">{isMobileCollapsed ? '▼' : '▲'}</span>
+                </h2>
+
                 <div className="sort-container" ref={dropdownRef}>
                     <button
                         className={`sort-dropdown-toggle mono-text ${isOpen ? 'active' : ''}`}
@@ -85,7 +94,6 @@ export default function ManifestSidebar({ ulds, loadOrder }) {
                         </div>
                     )}
                 </div>
-                <h2 className="manifest-title label-text">Cargo Manifest</h2>
             </header>
 
             <div className="manifest-list">

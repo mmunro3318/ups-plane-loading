@@ -177,6 +177,10 @@
     text-align: center;
 }
 
+.mobile-only-toggle {
+    display: none;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 1024px) {
     .manifest-sidebar {
@@ -184,5 +188,21 @@
         height: 60vh;
         /* Bounded height so it doesn't take over the entire scroll view */
         padding: 16px;
+        transition: height 0.3s ease;
+    }
+
+    .manifest-sidebar.collapsed {
+        height: auto;
+    }
+
+    .manifest-sidebar.collapsed .manifest-list,
+    .manifest-sidebar.collapsed .manifest-footer {
+        display: none;
+    }
+
+    .mobile-only-toggle {
+        display: inline-block;
+        font-size: 0.8rem;
+        opacity: 0.7;
     }
 }

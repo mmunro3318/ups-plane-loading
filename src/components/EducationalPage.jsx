@@ -3,6 +3,7 @@ import './EducationalPage.css';
 
 export default function EducationalPage({ onBack }) {
     const [activeTab, setActiveTab] = useState('problem');
+    const [isZoomed, setIsZoomed] = useState(false);
 
     return (
         <div className="edu-layout">
@@ -10,10 +11,16 @@ export default function EducationalPage({ onBack }) {
                 <h1 className="cyber-title" style={{ cursor: 'pointer' }} onClick={onBack}>
                     UPS <span>LoadBalancer</span>
                 </h1>
-                <div className="header-status mono-text">
-                    <span className="dot active"></span> SYSTEM ONLINE // KNOWLEDGE BASE
-                </div>
             </header>
+
+            <div className="top-nav-bar glass-panel">
+                <button className="nav-btn" onClick={onBack}>
+                    <span className="nav-icon">✈️</span> AIRCRAFT
+                </button>
+                <button className="nav-btn active">
+                    <span className="nav-icon">📖</span> EDUCATION
+                </button>
+            </div>
 
             <main className="edu-main">
                 <div className="edu-navigation glass-panel">
@@ -28,9 +35,6 @@ export default function EducationalPage({ onBack }) {
                         onClick={() => setActiveTab('algorithm')}
                     >
                         THE ALGORITHM
-                    </button>
-                    <button className="edu-back-btn mono-text" onClick={onBack}>
-                        RETURN TO HUB
                     </button>
                 </div>
 
@@ -72,9 +76,9 @@ export default function EducationalPage({ onBack }) {
                             <h2 className="edu-title cyber-title">Simulated Annealing</h2>
 
                             <div className="edu-split-view">
-                                <div className="edu-visual">
+                                <div className={`edu-visual ${isZoomed ? 'zoomed' : ''}`} onClick={() => setIsZoomed(!isZoomed)}>
                                     <img src="/assets/sim-annealing-infographic.png" alt="Simulated Annealing Infographic" className="edu-image" />
-                                    <p className="caption mono-text">Fig 2. Just like tempering steel, the algorithm cools from a chaotic fluid state to an optimal rigid structure.</p>
+                                    {!isZoomed && <p className="caption mono-text">Fig 2. Click to zoom. Just like tempering steel, the algorithm cools from a chaotic fluid state to an optimal rigid structure.</p>}
                                 </div>
                                 <div className="edu-text">
                                     <h3>Metallurgical Mathematics</h3>

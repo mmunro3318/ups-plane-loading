@@ -193,7 +193,11 @@ function App() {
           UPS <span>LoadBalancer</span>
         </h1>
         <div className="header-status mono-text">
-          <span className="dot active"></span> SYSTEM ONLINE // {selectedPlane || 'B757-200F'}
+          {macPercent !== null && (
+            <span className="header-mac-badge" style={{ color: 'var(--color-mac-green)', padding: '4px 12px', border: '1px solid var(--color-mac-green)', borderRadius: '4px' }}>
+              MAC: {macPercent}%
+            </span>
+          )}
         </div>
       </header>
 
