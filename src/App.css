@@ -5,6 +5,8 @@
   height: 100vh;
   padding: 24px;
   gap: 24px;
+  overflow-y: auto;
+  /* Allow scrolling if content overflows on smaller screens */
 }
 
 .app-header {
@@ -84,4 +86,25 @@
 
 .control-section {
   flex: 0 0 auto;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+  .app-layout {
+    height: auto;
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  .dashboard-main {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .manifest-section,
+  .stage-section,
+  .control-section {
+    width: 100%;
+    flex: none;
+  }
 }

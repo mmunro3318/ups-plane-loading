@@ -176,3 +176,13 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+    .manifest-sidebar {
+        width: 100%;
+        height: 60vh;
+        /* Bounded height so it doesn't take over the entire scroll view */
+        padding: 16px;
+    }
+}

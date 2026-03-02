@@ -225,3 +225,17 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+    .control-panel {
+        width: 100%;
+        max-width: none;
+        padding: 16px;
+    }
+
+    .radio-group {
+        flex-wrap: wrap;
+        /* allow long radio inputs to wrap to the next line */
+    }
+}
