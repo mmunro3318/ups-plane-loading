@@ -9,7 +9,7 @@ const PLANES = [
     { id: 'MD11F', name: 'MD-11', active: false, image: '/assets/MD11-collectible-card.png', description: 'Heavy-lift intercontinental freighter.' },
 ];
 
-export default function LandingPage({ onSelectPlane }) {
+export default function LandingPage({ onSelectPlane, onLearnMore }) {
     return (
         <div className="landing-layout">
             <header className="app-header">
@@ -20,6 +20,20 @@ export default function LandingPage({ onSelectPlane }) {
             </header>
 
             <main className="landing-main">
+                <h2 className="landing-subtitle label-text" style={{ marginTop: '0', marginBottom: '20px' }}>EDUCATIONAL RESOURCES</h2>
+
+                <div className="plane-grid-container" style={{ marginBottom: '40px', justifyContent: 'center' }}>
+                    <div
+                        className="plane-card glass-panel active-sim"
+                        onClick={onLearnMore}
+                        title="Learn more about load balancing and simulated annealing"
+                    >
+                        <div className="plane-card-image">
+                            <img src="/assets/digital-sword.png" alt="Educational Resources" />
+                        </div>
+                    </div>
+                </div>
+
                 <h2 className="landing-subtitle label-text">INITIALIZE ROUTING OPTIMIZATION</h2>
 
                 <div className="plane-grid-container">

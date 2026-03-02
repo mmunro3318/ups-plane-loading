@@ -4,6 +4,7 @@ import PlaneStage from './components/PlaneStage';
 import ManifestSidebar from './components/ManifestSidebar';
 import ControlPanel from './components/ControlPanel';
 import LandingPage from './components/LandingPage';
+import EducationalPage from './components/EducationalPage';
 import ScorePlot from './components/ScorePlot';
 import { generateEmptySlots, BOEING_757_SPECS } from './engine/planeData';
 import { optimizeLoadOrder, randomizeLoadOrder } from './engine/optimizer';
@@ -37,6 +38,10 @@ function App() {
   const handleSelectPlane = (planeId) => {
     setSelectedPlane(planeId);
     setView('dashboard');
+  };
+
+  const handleLearnMore = () => {
+    setView('education');
   };
 
   // Initial loading logic moved to a reusable function
@@ -174,7 +179,11 @@ function App() {
   };
 
   if (view === 'landing') {
-    return <LandingPage onSelectPlane={handleSelectPlane} />;
+    return <LandingPage onSelectPlane={handleSelectPlane} onLearnMore={handleLearnMore} />;
+  }
+
+  if (view === 'education') {
+    return <EducationalPage onBack={() => setView('landing')} />;
   }
 
   return (
